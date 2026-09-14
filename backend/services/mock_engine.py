@@ -5,20 +5,34 @@ using keyword-based document classification and curated response templates
 for predatory freelance agreements, residential leases, and general contracts.
 """
 
-import re
 from typing import Dict, Any, List
-from ..models.schemas import (
+from backend.models.schemas import (
     AnalyzeResponse, ClauseExplanation, RiskItem, ChecklistItem, LawyerPrep,
     CompareResponse, ClauseComparison, ChatResponse, SimplifyResponse
 )
-from ..utils.security import get_standard_disclaimer
+from backend.utils.security import get_standard_disclaimer
+
 
 def get_mock_analysis(text: str, reading_level: str = "Plain English") -> AnalyzeResponse:
+    """Generate a deterministic legal analysis based on keyword detection.
+
+    Classifies the document as predatory freelance, residential lease, or
+    general contract based on keyword presence, then returns a pre-built
+    comprehensive analysis response.
+
+    Args:
+        text: The sanitized legal document text.
+        reading_level: Target reading level (Plain English, Executive, ELI5).
+
+    Returns:
+        An AnalyzeResponse with risk scores, clauses, and recommendations.
+    """
     lower = text.lower()
     disclaimer = get_standard_disclaimer()
 
-    # Detect Predatory Freelance
-    if "cayman islands" in lower or "independent contractor" in lower or "non-compete" in lower and "36" in lower:
+    # Detect Predatory Freelance (fixed operator precedence with parentheses)
+    if ("cayman islands" in lower or "independent contractor" in lower
+            or ("non-compete" in lower and "36" in lower)):
         return AnalyzeResponse(
             document_title="Independent Contractor & IP Assignment Agreement",
             document_type="Freelance / Consulting Agreement",
@@ -366,6 +380,17 @@ def get_mock_analysis(text: str, reading_level: str = "Plain English") -> Analyz
     )
 
 def get_mock_comparison(contract_a: str, contract_b: str, name_a: str = "Contract A", name_b: str = "Contract B") -> CompareResponse:
+    """Generate a deterministic contract comparison response.
+
+    Args:
+        contract_a: Text of the first contract.
+        contract_b: Text of the second contract.
+        name_a: Display name for contract A.
+        name_b: Display name for contract B.
+
+    Returns:
+        A CompareResponse with favorability scores and clause divergences.
+    """
     disclaimer = get_standard_disclaimer()
     return CompareResponse(
         comparison_title=f"Comparison: {name_a} vs. {name_b}",
@@ -423,6 +448,15 @@ def get_mock_comparison(contract_a: str, contract_b: str, name_a: str = "Contrac
     )
 
 def get_mock_chat_response(query: str, doc_text: str) -> ChatResponse:
+    """Generate a deterministic grounded Q&A response based on keyword matching.
+
+    Args:
+        query: The user's natural-language question.
+        doc_text: The legal document text to ground answers in.
+
+    Returns:
+        A ChatResponse with answer, citations, risk notes, and follow-ups.
+    """
     q_lower = query.lower()
     disclaimer = get_standard_disclaimer()
 
@@ -543,6 +577,15 @@ def get_mock_chat_response(query: str, doc_text: str) -> ChatResponse:
     )
 
 def get_mock_simplification(clause_text: str, reading_level: str = "Plain English") -> SimplifyResponse:
+    """Simplify a legal clause into plain-English language.
+
+    Args:
+        clause_text: The original legal clause text.
+        reading_level: Target reading level for the simplification.
+
+    Returns:
+        A SimplifyResponse with simplified text and risk assessment.
+    """
     if "indemnif" in clause_text.lower():
         return SimplifyResponse(
             original=clause_text,

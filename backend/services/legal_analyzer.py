@@ -2,20 +2,28 @@
 
 Provides AI-powered and deterministic legal document analysis using
 Google Gemini structured outputs with automatic fallback to the
-offline mock engine.
+offline mock engine when no API key is configured.
+
+The analysis produces:
+    - Clause-by-clause plain-English explanations
+    - A 0-100 Legal Risk Index score
+    - Identified red flags with severity ratings
+    - Actionable due diligence checklists
+    - Attorney consultation briefing packs
 """
 
 import json
 import logging
-from typing import Optional
 
-from ..config import DEFAULT_MODEL, GEMINI_API_KEY, HAS_GEMINI_KEY
-from ..models.schemas import AnalyzeResponse
-from ..utils.security import get_standard_disclaimer
-from .mock_engine import get_mock_analysis
+from backend.config import DEFAULT_MODEL, GEMINI_API_KEY, HAS_GEMINI_KEY
+from backend.models.schemas import AnalyzeResponse
+from backend.utils.security import get_standard_disclaimer
+from backend.services.mock_engine import get_mock_analysis
 
+# Configure module-level logger
 logger: logging.Logger = logging.getLogger("lexiaid.analyzer")
 
+# System prompt for Gemini structured output
 ANALYSIS_SYSTEM_PROMPT: str = """You are LexiAid, an elite Legal Document Intelligence and Access AI assistant.
 Your mission is to make legal contracts, leases, and agreements accessible, transparent, and actionable for non-lawyers.
 
@@ -53,6 +61,7 @@ def analyze_legal_document(
     Returns:
         An AnalyzeResponse with risk scores, clause breakdowns, and advice.
     """
+    # Use deterministic engine if no API key or forced mock mode
     if force_mock or not HAS_GEMINI_KEY:
         return get_mock_analysis(text, reading_level)
 
@@ -62,7 +71,7 @@ def analyze_legal_document(
         client = genai.Client(api_key=GEMINI_API_KEY)
         prompt: str = (
             f"Reading Level Target: {reading_level}\n\n"
-            f"Document Text:\n\"\"\"\n{text}\n\"\"\""
+            f'Document Text:\n"""\n{text}\n"""'
         )
 
         response = client.models.generate_content(

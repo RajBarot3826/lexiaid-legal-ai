@@ -1,20 +1,23 @@
 """Grounded legal document Q&A service.
 
 Provides citation-backed answers to user questions, strictly
-grounded in the text of the provided legal document.
+grounded in the text of the provided legal document to prevent
+hallucination and ensure factual accuracy.
 """
 
 import json
 import logging
 from typing import List, Optional
 
-from ..config import DEFAULT_MODEL, GEMINI_API_KEY, HAS_GEMINI_KEY
-from ..models.schemas import ChatMessage, ChatResponse
-from ..utils.security import get_standard_disclaimer
-from .mock_engine import get_mock_chat_response
+from backend.config import DEFAULT_MODEL, GEMINI_API_KEY, HAS_GEMINI_KEY
+from backend.models.schemas import ChatMessage, ChatResponse
+from backend.utils.security import get_standard_disclaimer
+from backend.services.mock_engine import get_mock_chat_response
 
+# Configure module-level logger
 logger: logging.Logger = logging.getLogger("lexiaid.chat")
 
+# System prompt for Gemini grounded Q&A
 CHAT_SYSTEM_PROMPT: str = """You are LexiAid's Grounded Legal Document Q&A Agent.
 Answer user questions accurately based STRICTLY on the provided legal document.
 
@@ -37,6 +40,9 @@ def answer_legal_query(
 ) -> ChatResponse:
     """Answer a legal question grounded in the provided document.
 
+    All answers are strictly bounded to the document text with verbatim
+    citations to prevent AI hallucination.
+
     Args:
         query: The user's natural-language question.
         document_text: Sanitized legal document text for context.
@@ -46,6 +52,7 @@ def answer_legal_query(
     Returns:
         A ChatResponse with a grounded answer, citations, and follow-ups.
     """
+    # Use deterministic engine if no API key or forced mock mode
     if force_mock or not HAS_GEMINI_KEY:
         return get_mock_chat_response(query, document_text)
 

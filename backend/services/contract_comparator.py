@@ -1,19 +1,22 @@
 """Contract comparison service.
 
 Compares two legal documents to identify divergences, additions,
-omissions, and relative party favorability.
+omissions, and relative party favorability using Google Gemini AI
+with automatic fallback to the deterministic mock engine.
 """
 
 import json
 import logging
 
-from ..config import DEFAULT_MODEL, GEMINI_API_KEY, HAS_GEMINI_KEY
-from ..models.schemas import CompareResponse
-from ..utils.security import get_standard_disclaimer
-from .mock_engine import get_mock_comparison
+from backend.config import DEFAULT_MODEL, GEMINI_API_KEY, HAS_GEMINI_KEY
+from backend.models.schemas import CompareResponse
+from backend.utils.security import get_standard_disclaimer
+from backend.services.mock_engine import get_mock_comparison
 
+# Configure module-level logger
 logger: logging.Logger = logging.getLogger("lexiaid.comparator")
 
+# System prompt for Gemini structured comparison output
 COMPARISON_SYSTEM_PROMPT: str = """You are LexiAid's Contract Comparison Engine.
 Compare two legal documents and identify key divergences, additions, omissions, and party favorability.
 
@@ -48,6 +51,7 @@ def compare_legal_documents(
     Returns:
         A CompareResponse with favorability scores and clause comparisons.
     """
+    # Use deterministic engine if no API key or forced mock mode
     if force_mock or not HAS_GEMINI_KEY:
         return get_mock_comparison(contract_a, contract_b, name_a, name_b)
 

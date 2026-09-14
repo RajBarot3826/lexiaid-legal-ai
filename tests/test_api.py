@@ -274,3 +274,32 @@ class TestSimplifyEndpoint:
         assert response.status_code == 200
         data = response.json()
         assert "Safe" in data["risk_verdict"] or "Moderate" in data["risk_verdict"]
+
+
+# ---------------------------------------------------------------------------
+# Security Headers
+# ---------------------------------------------------------------------------
+class TestSecurityHeaders:
+    """Tests for security hardening headers on all responses."""
+
+    def test_x_content_type_options_header_is_nosniff(self) -> None:
+        """All responses should include X-Content-Type-Options: nosniff."""
+        response = client.get("/api/health")
+        assert response.headers.get("X-Content-Type-Options") == "nosniff"
+
+    def test_x_frame_options_header_is_deny(self) -> None:
+        """All responses should include X-Frame-Options: DENY to prevent clickjacking."""
+        response = client.get("/api/health")
+        assert response.headers.get("X-Frame-Options") == "DENY"
+
+    def test_referrer_policy_header_is_set(self) -> None:
+        """All responses should include a Referrer-Policy header."""
+        response = client.get("/api/health")
+        assert "Referrer-Policy" in response.headers
+
+    def test_processing_time_header_is_numeric(self) -> None:
+        """X-Processing-Time-Ms should be a valid positive number."""
+        response = client.get("/api/health")
+        time_ms = float(response.headers["X-Processing-Time-Ms"])
+        assert time_ms >= 0
+

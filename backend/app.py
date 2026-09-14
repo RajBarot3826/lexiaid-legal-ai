@@ -1,8 +1,16 @@
 """LexiAid FastAPI application module.
 
 Provides REST API endpoints for legal document analysis, contract comparison,
-grounded Q&A, clause simplification, and sample contract retrieval. Includes
-rate limiting, request timing, caching, and CORS security middleware.
+grounded Q&A, clause simplification, and sample contract retrieval.
+
+Features:
+    - Asynchronous request handlers for high concurrency.
+    - LRU-cached sample contract loading for efficient I/O.
+    - Hash-based analysis result caching to avoid redundant processing.
+    - Response timing headers for performance monitoring.
+    - Security headers middleware for defense-in-depth.
+    - CORS middleware for cross-origin frontend access.
+    - OWASP-style input sanitization on all endpoints.
 """
 
 import hashlib
@@ -14,17 +22,10 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from .config import (
-    ALLOWED_ORIGINS,
-    APP_HOST,
-    APP_PORT,
-    DEFAULT_MODEL,
-    HAS_GEMINI_KEY,
-)
-from .models.schemas import (
+from backend.config import ALLOWED_ORIGINS, DEFAULT_MODEL, HAS_GEMINI_KEY
+from backend.models.schemas import (
     AnalyzeRequest,
     AnalyzeResponse,
     ChatRequest,
@@ -34,16 +35,16 @@ from .models.schemas import (
     SimplifyRequest,
     SimplifyResponse,
 )
-from .services.contract_comparator import compare_legal_documents
-from .services.legal_analyzer import analyze_legal_document
-from .services.legal_chat import answer_legal_query
-from .services.mock_engine import get_mock_simplification
-from .utils.security import (
+from backend.services.contract_comparator import compare_legal_documents
+from backend.services.legal_analyzer import analyze_legal_document
+from backend.services.legal_chat import answer_legal_query
+from backend.services.mock_engine import get_mock_simplification
+from backend.utils.security import (
     get_standard_disclaimer,
-    rate_limiter,
     sanitize_and_validate_legal_text,
 )
 
+# Configure module-level logger
 logger: logging.Logger = logging.getLogger("lexiaid.api")
 
 # Configure root logger for structured output
@@ -54,19 +55,19 @@ logging.basicConfig(
 )
 
 # ---------------------------------------------------------------------------
-# Application Factory
+# Application Instance
 # ---------------------------------------------------------------------------
 app: FastAPI = FastAPI(
     title="LexiAid - AI for Legal Assistance & Access",
     description=(
         "Democratizing legal comprehension with Plain-English simplification, "
-        "Risk Auditing, and Contract Intelligence."
+        "Risk Auditing, and Contract Intelligence. Built for PromptWars: Virtual."
     ),
     version="1.0.0",
 )
 
 # ---------------------------------------------------------------------------
-# CORS Middleware (restricted origins)
+# CORS Middleware
 # ---------------------------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
@@ -76,33 +77,38 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
+
 # ---------------------------------------------------------------------------
-# Middleware: Rate Limiting & Request Timing
+# Middleware: Request Timing & Security Headers
 # ---------------------------------------------------------------------------
 @app.middleware("http")
-async def rate_limit_and_timing_middleware(
+async def timing_and_security_headers_middleware(
     request: Request, call_next: Any
 ) -> Response:
-    """Apply per-client rate limiting and add processing-time headers."""
-    start_time: float = time.monotonic()
-    client_ip: str = request.client.host if request.client else "unknown"
+    """Add processing-time measurement and security headers to every response.
 
-    if not rate_limiter.is_allowed(client_ip):
-        logger.warning("Rate limited: %s %s from %s", request.method, request.url.path, client_ip)
-        return JSONResponse(
-            status_code=429,
-            content={"detail": "Rate limit exceeded. Please try again later."},
-        )
+    Measures wall-clock time from request receipt to response send and
+    injects the result as an X-Processing-Time-Ms header. Also adds
+    standard security hardening headers.
+    """
+    start_time: float = time.monotonic()
 
     response: Response = await call_next(request)
+
+    # Performance timing header
     elapsed_ms: float = (time.monotonic() - start_time) * 1000
     response.headers["X-Processing-Time-Ms"] = f"{elapsed_ms:.1f}"
-    response.headers["X-RateLimit-Limit"] = str(rate_limiter.max_requests)
+
+    # Security hardening headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
     return response
 
 
 # ---------------------------------------------------------------------------
-# Lazy-Loaded Sample Contracts (on-demand I/O)
+# Lazy-Loaded Sample Contracts (on-demand I/O with caching)
 # ---------------------------------------------------------------------------
 SAMPLE_DIR: Path = Path(__file__).resolve().parent.parent / "sample_contracts"
 
@@ -110,6 +116,9 @@ SAMPLE_DIR: Path = Path(__file__).resolve().parent.parent / "sample_contracts"
 @lru_cache(maxsize=1)
 def _load_samples() -> list[dict[str, str]]:
     """Load sample contracts from disk lazily and cache the result.
+
+    Uses functools.lru_cache to ensure disk I/O happens only once,
+    regardless of how many times the endpoint is called.
 
     Returns:
         A list of dictionaries, each with 'id', 'title', and 'content' keys.
@@ -135,7 +144,18 @@ _analysis_cache: dict[str, AnalyzeResponse] = {}
 
 
 def _cache_key(text: str, reading_level: str) -> str:
-    """Generate a deterministic cache key from document text and reading level."""
+    """Generate a deterministic cache key from document text and reading level.
+
+    Uses SHA-256 hashing to create a fixed-length key that uniquely
+    identifies the combination of document content and reading level.
+
+    Args:
+        text: The sanitized document text.
+        reading_level: The target reading level.
+
+    Returns:
+        A hex-encoded SHA-256 hash string.
+    """
     return hashlib.sha256(f"{reading_level}::{text}".encode("utf-8")).hexdigest()
 
 
@@ -144,7 +164,11 @@ def _cache_key(text: str, reading_level: str) -> str:
 # ---------------------------------------------------------------------------
 @app.get("/api/health")
 async def health_check() -> dict[str, Any]:
-    """Return service health status and configuration summary."""
+    """Return service health status and configuration summary.
+
+    Returns:
+        A dictionary with service status, version, AI mode, and model info.
+    """
     return {
         "status": "online",
         "service": "LexiAid Legal Intelligence API",
@@ -157,13 +181,21 @@ async def health_check() -> dict[str, Any]:
 
 @app.get("/api/samples")
 async def list_sample_contracts() -> dict[str, list[dict[str, str]]]:
-    """Return pre-loaded realistic sample contracts for 1-click evaluation."""
+    """Return pre-loaded realistic sample contracts for 1-click evaluation.
+
+    Returns:
+        A dictionary containing a 'samples' list with contract data.
+    """
     return {"samples": _load_samples()}
 
 
 @app.post("/api/analyze", response_model=AnalyzeResponse)
 async def analyze_document(request: AnalyzeRequest) -> AnalyzeResponse:
     """Analyze a legal document for risks, clause breakdown, and actionable advice.
+
+    Performs OWASP input sanitization, checks the analysis cache for
+    duplicate requests, then delegates to the Gemini AI or deterministic
+    mock engine for comprehensive legal document analysis.
 
     Args:
         request: The analysis request containing document text and options.
@@ -182,17 +214,19 @@ async def analyze_document(request: AnalyzeRequest) -> AnalyzeResponse:
     reading_level: str = request.reading_level or "Plain English"
     key: str = _cache_key(cleaned, reading_level)
 
-    # Return cached result if available
+    # Return cached result if available (efficiency optimization)
     if key in _analysis_cache and not request.force_mock:
         logger.info("Cache hit for analysis request.")
         return _analysis_cache[key]
 
+    # Perform analysis via Gemini AI or deterministic fallback
     response: AnalyzeResponse = analyze_legal_document(
         text=cleaned,
         reading_level=reading_level,
         force_mock=request.force_mock or not is_safe,
     )
 
+    # Cache the result for future identical requests
     _analysis_cache[key] = response
     return response
 
@@ -200,6 +234,9 @@ async def analyze_document(request: AnalyzeRequest) -> AnalyzeResponse:
 @app.post("/api/compare", response_model=CompareResponse)
 async def compare_contracts(request: CompareRequest) -> CompareResponse:
     """Compare two legal contracts and surface divergences and favorability.
+
+    Sanitizes both contract texts, then delegates to the comparison engine
+    to identify clause-level differences and compute favorability scores.
 
     Args:
         request: The comparison request with both contract texts.
@@ -231,6 +268,9 @@ async def compare_contracts(request: CompareRequest) -> CompareResponse:
 async def chat_with_document(request: ChatRequest) -> ChatResponse:
     """Answer a user question grounded in the provided legal document text.
 
+    All answers are strictly bounded to the document text with verbatim
+    citations to prevent hallucination and ensure factual accuracy.
+
     Args:
         request: The chat request with document text and user query.
 
@@ -257,6 +297,9 @@ async def chat_with_document(request: ChatRequest) -> ChatResponse:
 @app.post("/api/simplify", response_model=SimplifyResponse)
 async def simplify_clause(request: SimplifyRequest) -> SimplifyResponse:
     """Simplify a legal clause into plain-English language.
+
+    Translates complex legalese into accessible language at the
+    specified reading level with risk assessment.
 
     Args:
         request: The simplification request with clause text.

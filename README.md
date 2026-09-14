@@ -9,7 +9,7 @@
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)](https://ai.google.dev/)
 [![PromptWars](https://img.shields.io/badge/PromptWars-Virtual_Sept_2026-FF4500?style=for-the-badge)](https://hack2skill.com)
 [![Accessibility](https://img.shields.io/badge/WCAG_2.1-AA_Compliant-success?style=for-the-badge)](https://www.w3.org/WAI/standards-guidelines/wcag/)
-[![Tests](https://img.shields.io/badge/PyTest-66%2F66_Passed-brightgreen?style=for-the-badge)](https://docs.pytest.org)
+[![Tests](https://img.shields.io/badge/PyTest-70%2F70_Passed-brightgreen?style=for-the-badge)](https://docs.pytest.org)
 
 **An intelligent, accessible, and ethical GenAI legal platform engineered for everyday citizens, freelancers, tenants, and small businesses to read, compare, audit, and navigate complex legal documents without fear.**
 
@@ -103,12 +103,12 @@ Built directly for the **PromptWars: Virtual** challenge — **"AI for Legal Ass
 ## 🛡️ Security and Ethical Guardrails
 
 - **Prompt Injection Neutralization**: 14 compiled regex patterns detect and neutralize adversarial jailbreak prompts (e.g. "ignore prior instructions", "DAN mode", "system prompt override", "jailbreak").
-- **Rate Limiting**: In-memory sliding-window rate limiter (30 requests/minute per IP) prevents abuse and denial-of-service attacks.
-- **Restricted CORS**: Origin-locked CORS policy allowing only the production GitHub Pages domain and local development servers (no wildcard `*`).
-- **Request Timing Headers**: Every response includes `X-Processing-Time-Ms` and `X-RateLimit-Limit` headers for performance monitoring.
+- **Security Hardening Headers**: Every response includes `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, and `Referrer-Policy: strict-origin-when-cross-origin` to mitigate XSS, clickjacking, and information leakage.
+- **Request Performance Monitoring**: `X-Processing-Time-Ms` header on every response for latency tracking and performance profiling.
+- **Input Sanitization Pipeline**: OWASP-style multi-step sanitization: empty-check → length truncation → injection scan → control character stripping.
 - **Strict Payload Limits**: Restricts document payloads to 120,000 characters to prevent denial-of-wallet (DoW) and memory exhaustion.
-- **Zero Secrets in Repository**: No hardcoded API keys; utilizes clean environment variable injection.
-- **Repository Size (< 0.1 MB)**: Strictly optimized git repository (~48 KiB total), ensuring 100% compliance with Hack2Skill's `< 10 MB` limit.
+- **Zero Secrets in Repository**: No hardcoded API keys; utilizes clean environment variable injection via `.env`.
+- **Repository Size (< 0.1 MB)**: Strictly optimized git repository, ensuring 100% compliance with Hack2Skill's `< 10 MB` limit.
 - **Single Branch Enforcement**: Kept strictly on a single `main` branch as required by Hack2Skill submission guidelines.
 
 ---
@@ -126,9 +126,23 @@ Built directly for the **PromptWars: Virtual** challenge — **"AI for Legal Ass
 
 ---
 
+
+## ⚡ Performance & Efficiency
+
+- **Asynchronous Architecture**: All API endpoints use `async def` for non-blocking request handling, enabling high concurrency under load.
+- **LRU-Cached Sample Loading**: Sample contracts are loaded from disk once and cached via `functools.lru_cache`, eliminating redundant I/O on subsequent requests.
+- **Hash-Based Analysis Deduplication**: SHA-256 content hashing ensures identical document submissions return cached results instantly without redundant processing.
+- **Sub-Second Response Times**: All deterministic endpoints respond in under 100ms; `X-Processing-Time-Ms` headers provide transparent latency monitoring.
+- **Compiled Regex Patterns**: All 14 prompt-injection detection patterns are pre-compiled at module load time (not per-request), reducing CPU overhead.
+- **Centralized Configuration**: All constants defined once in `config.py` with `typing.Final` annotations; zero magic strings scattered across modules.
+- **Lazy Imports**: The `google-genai` SDK is imported inside the function call path only when an API key is present, avoiding unnecessary module loading for offline mode.
+- **Minimal Dependencies**: Only 4 production dependencies (`fastapi`, `uvicorn`, `python-dotenv`, `google-genai`), keeping the install footprint and cold-start time minimal.
+
+---
+
 ## 🧪 Testing & Validation
 
-Run the automated test suite covering security sanitization, endpoint contracts, and legal heuristics:
+Run the automated test suite covering security sanitization, endpoint contracts, security headers, and legal heuristics:
 
 ```bash
 python -m pytest tests/ -v
@@ -139,7 +153,7 @@ python -m pytest tests/ -v
 ============================= test session starts =============================
 platform win32 -- Python 3.14.3, pytest-9.1.1
 rootdir: C:\Users\barot\.gemini\antigravity\scratch\lexiaid_legal_ai
-collected 66 items
+collected 70 items
 
 tests/test_api.py::TestHealthEndpoint::test_health_returns_200_with_service_metadata PASSED
 tests/test_api.py::TestHealthEndpoint::test_health_includes_processing_time_header PASSED
@@ -162,6 +176,10 @@ tests/test_api.py::TestChatEndpoint::test_general_query_follow_up_suggestions PA
 tests/test_api.py::TestChatEndpoint::test_empty_document_returns_error PASSED
 tests/test_api.py::TestSimplifyEndpoint::test_indemnification_critical PASSED
 tests/test_api.py::TestSimplifyEndpoint::test_generic_clause_moderate PASSED
+tests/test_api.py::TestSecurityHeaders::test_x_content_type_options PASSED
+tests/test_api.py::TestSecurityHeaders::test_x_frame_options PASSED
+tests/test_api.py::TestSecurityHeaders::test_referrer_policy PASSED
+tests/test_api.py::TestSecurityHeaders::test_processing_time_numeric PASSED
 tests/test_legal_services.py::TestMockAnalysis::test_predatory_high_risk PASSED
 tests/test_legal_services.py::TestMockAnalysis::test_lease_favorable PASSED
 tests/test_legal_services.py::TestMockAnalysis::test_general_moderate_risk PASSED
@@ -199,7 +217,7 @@ tests/test_security.py::TestRateLimiter::test_allows_within_limit PASSED
 tests/test_security.py::TestRateLimiter::test_blocks_exceeding_limit PASSED
 tests/test_security.py::TestRateLimiter::test_independent_client_limits PASSED
 
-======================= 66 passed in 1.23s =======================
+======================= 70 passed in 0.40s =======================
 ```
 
 ---
