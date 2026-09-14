@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LexiAid is an AI-powered legal assistance platform that simplifies complex legal documents, audits contract risks, compares agreements, and prepares attorney consultation packs.">
   <title>LexiAid — AI for Legal Assistance & Access</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,6 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+  <!-- Skip to Main Content (Accessibility) -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Statutory Legal Disclaimer Banner -->
   <aside class="disclaimer-banner" role="complementary" aria-label="Legal Disclaimer">
@@ -26,62 +30,63 @@
       </div>
     </div>
     <div class="header-right">
-      <span class="status-badge" id="ai-status">
-        <span class="pulse-dot"></span>
+      <span class="status-badge" id="ai-status" role="status" aria-live="polite">
+        <span class="pulse-dot" aria-hidden="true"></span>
         <span id="ai-status-text">Gemini Intelligence Active</span>
       </span>
     </div>
   </header>
 
-  <!-- Tab Navigation (Accessible ARIA TabList) -->
+  <!-- Tab Navigation (Accessible ARIA TabList with Keyboard Support) -->
   <nav class="tab-nav" role="tablist" aria-label="Legal Tools">
-    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-analyze" id="btn-tab-analyze" onclick="switchTab('analyze')">
-      <span>📄</span> Analyze &amp; Simplify
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-analyze" id="btn-tab-analyze" tabindex="0" onclick="switchTab('analyze')">
+      <span aria-hidden="true">📄</span> Analyze &amp; Simplify
     </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-compare" id="btn-tab-compare" onclick="switchTab('compare')">
-      <span>⚖️</span> Compare Contracts
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-compare" id="btn-tab-compare" tabindex="-1" onclick="switchTab('compare')">
+      <span aria-hidden="true">⚖️</span> Compare Contracts
     </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-chat" id="btn-tab-chat" onclick="switchTab('chat')">
-      <span>💬</span> Grounded Q&amp;A Chat
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-chat" id="btn-tab-chat" tabindex="-1" onclick="switchTab('chat')">
+      <span aria-hidden="true">💬</span> Grounded Q&amp;A Chat
     </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-checklist" id="btn-tab-checklist" onclick="switchTab('checklist')">
-      <span>✅</span> Due Diligence Checklist
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-checklist" id="btn-tab-checklist" tabindex="-1" onclick="switchTab('checklist')">
+      <span aria-hidden="true">✅</span> Due Diligence Checklist
     </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-prep" id="btn-tab-prep" onclick="switchTab('prep')">
-      <span>👔</span> Lawyer Prep-Pack
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-prep" id="btn-tab-prep" tabindex="-1" onclick="switchTab('prep')">
+      <span aria-hidden="true">👔</span> Lawyer Prep-Pack
     </button>
   </nav>
 
   <!-- Main Container -->
-  <main role="main">
+  <main id="main-content" role="main">
 
     <!-- ==================== TAB 1: ANALYZE & SIMPLIFY ==================== -->
     <section id="tab-analyze" class="tab-panel active" role="tabpanel" aria-labelledby="btn-tab-analyze">
       <div class="card">
-        <div class="card-title">
+        <h2 class="card-title">
           <span>Upload or Paste Legal Document</span>
           <div class="sample-bar">
             <span style="font-size: 0.8rem; color: var(--text-muted);">Quick 1-Click Samples:</span>
-            <button class="sample-btn" onclick="loadSample('predatory_freelance')">⚠️ Predatory Freelance</button>
-            <button class="sample-btn" onclick="loadSample('residential_lease')">🏠 Residential Lease</button>
-            <button class="sample-btn" onclick="loadSample('standard_nda')">🔒 Mutual NDA</button>
+            <button class="sample-btn" onclick="loadSample('predatory_freelance')" aria-label="Load predatory freelance agreement sample">⚠️ Predatory Freelance</button>
+            <button class="sample-btn" onclick="loadSample('residential_lease')" aria-label="Load residential lease agreement sample">🏠 Residential Lease</button>
+            <button class="sample-btn" onclick="loadSample('standard_nda')" aria-label="Load mutual NDA sample">🔒 Mutual NDA</button>
           </div>
-        </div>
+        </h2>
 
-        <label for="contract-input" class="visually-hidden" style="display:none;">Legal Document Text</label>
-        <textarea id="contract-input" placeholder="Paste your legal contract, rental lease, terms of service, or employment agreement here (or click one of the quick samples above)..." aria-label="Legal Document Text"></textarea>
+        <p id="contract-input-desc" class="visually-hidden">Paste or type the full text of a legal contract, lease, or agreement for AI-powered analysis.</p>
+        <label for="contract-input" class="visually-hidden">Legal Document Text</label>
+        <textarea id="contract-input" placeholder="Paste your legal contract, rental lease, terms of service, or employment agreement here (or click one of the quick samples above)..." aria-label="Legal Document Text" aria-describedby="contract-input-desc"></textarea>
 
         <div class="action-row">
           <div style="display: flex; align-items: center; gap: 0.8rem;">
             <label for="reading-level" style="font-size: 0.88rem; color: var(--text-secondary);">Reading Level:</label>
-            <select id="reading-level" style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.4rem 0.8rem; border-radius: 6px;">
+            <select id="reading-level" aria-label="Select reading level for analysis" style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.4rem 0.8rem; border-radius: 6px;">
               <option value="Plain English" selected>Plain English (8th Grade)</option>
               <option value="Executive">Executive Summary (Business)</option>
               <option value="ELI5">ELI5 (Super Simple)</option>
             </select>
           </div>
-          <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()">
-            <span id="btn-analyze-text">🔍 Analyze Contract &amp; Audit Risks</span>
+          <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()" aria-label="Analyze the pasted contract and audit risks">
+            <span id="btn-analyze-text" role="status">🔍 Analyze Contract &amp; Audit Risks</span>
           </button>
         </div>
       </div>
@@ -90,9 +95,9 @@
       <div id="analysis-results" style="display: none;">
         
         <!-- Risk & Score Banner -->
-        <div class="score-banner">
+        <div class="score-banner" role="region" aria-label="Risk Score Summary">
           <div class="gauge-box">
-            <div class="gauge-circle" id="risk-circle">88</div>
+            <div class="gauge-circle" id="risk-circle" aria-label="Legal Risk Score">88</div>
             <div>
               <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Legal Risk Index</div>
               <h2 id="risk-verdict-title" style="font-size: 1.4rem; margin: 0.2rem 0;">High Risk / Predatory</h2>
@@ -110,26 +115,26 @@
           
           <!-- Red Flag Risk Sentinel -->
           <div class="card">
-            <div class="card-title">
+            <h2 class="card-title">
               <span>🚨 Critical Red Flags &amp; Trap Scanner</span>
               <span class="badge badge-critical" id="risk-count-badge">4 Traps Found</span>
-            </div>
+            </h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
               Identified contractual clauses that impose extreme liability, financial traps, or restrict your statutory rights.
             </p>
-            <div id="risk-cards-container"></div>
+            <div id="risk-cards-container" role="list" aria-label="Identified contract risks"></div>
           </div>
 
           <!-- Clause-by-Clause Simplification -->
           <div class="card">
-            <div class="card-title">
+            <h2 class="card-title">
               <span>📖 Plain-English Clause Breakdown</span>
               <span class="badge badge-safe">Legalese Decomposed</span>
-            </div>
+            </h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
               Clause-by-clause translation into everyday conversational language with practical implications.
             </p>
-            <div id="clauses-container"></div>
+            <div id="clauses-container" role="list" aria-label="Clause explanations"></div>
           </div>
 
         </div>
@@ -139,10 +144,10 @@
     <!-- ==================== TAB 2: COMPARE CONTRACTS ==================== -->
     <section id="tab-compare" class="tab-panel" role="tabpanel" aria-labelledby="btn-tab-compare">
       <div class="card">
-        <div class="card-title">
+        <h2 class="card-title">
           <span>Dual-Contract Divergence &amp; Favorability Engine</span>
-          <button class="sample-btn" onclick="loadComparisonSample()">⚡ Load Sample: Standard NDA vs. Revised Draft</button>
-        </div>
+          <button class="sample-btn" onclick="loadComparisonSample()" aria-label="Load sample NDA comparison">⚡ Load Sample: Standard NDA vs. Revised Draft</button>
+        </h2>
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
           Compare two versions of an agreement, a vendor contract vs. counter-proposal, or lease revision to detect unilateral changes and traps.
         </p>
@@ -151,17 +156,19 @@
             <label for="compare-text-a" style="font-size: 0.88rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">
               Contract Version A (e.g. Original / Standard NDA)
             </label>
-            <textarea id="compare-text-a" style="min-height: 200px;" placeholder="Paste Version A..."></textarea>
+            <textarea id="compare-text-a" style="min-height: 200px;" placeholder="Paste Version A..." aria-describedby="compare-a-desc"></textarea>
+            <p id="compare-a-desc" class="visually-hidden">Paste the original or baseline version of the contract here.</p>
           </div>
           <div>
             <label for="compare-text-b" style="font-size: 0.88rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">
               Contract Version B (e.g. Revised Vendor Draft)
             </label>
-            <textarea id="compare-text-b" style="min-height: 200px;" placeholder="Paste Version B..."></textarea>
+            <textarea id="compare-text-b" style="min-height: 200px;" placeholder="Paste Version B..." aria-describedby="compare-b-desc"></textarea>
+            <p id="compare-b-desc" class="visually-hidden">Paste the revised or counter-proposal version of the contract here.</p>
           </div>
         </div>
         <div style="text-align: right; margin-top: 1rem;">
-          <button class="btn-primary" onclick="runComparison()">
+          <button class="btn-primary" onclick="runComparison()" aria-label="Compare the two contracts and analyze favorability">
             <span>⚖️ Compare Contracts &amp; Analyze Favorability</span>
           </button>
         </div>
@@ -169,16 +176,16 @@
 
       <!-- Comparison Results -->
       <div id="compare-results" style="display: none;">
-        <div class="score-banner">
+        <div class="score-banner" role="region" aria-label="Comparison Score Summary">
           <div style="display: flex; gap: 2rem; align-items: center;">
             <div style="text-align: center;">
               <div style="font-size: 0.8rem; color: var(--text-secondary);">VERSION A FAVORABILITY</div>
-              <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-emerald);" id="score-a">78%</div>
+              <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-emerald);" id="score-a" aria-label="Version A favorability score">78%</div>
             </div>
-            <div style="font-size: 1.5rem; color: var(--text-muted);">vs.</div>
+            <div style="font-size: 1.5rem; color: var(--text-muted);" aria-hidden="true">vs.</div>
             <div style="text-align: center;">
               <div style="font-size: 0.8rem; color: var(--text-secondary);">VERSION B FAVORABILITY</div>
-              <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-rose);" id="score-b">32%</div>
+              <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-rose);" id="score-b" aria-label="Version B favorability score">32%</div>
             </div>
           </div>
           <div style="flex: 1;">
@@ -189,7 +196,7 @@
 
         <div class="card">
           <h3 class="card-title">Key Clause Divergences &amp; Shift in Rights</h3>
-          <div id="comparison-table-container"></div>
+          <div id="comparison-table-container" role="table" aria-label="Contract clause comparison table"></div>
         </div>
       </div>
     </section>
@@ -197,33 +204,34 @@
     <!-- ==================== TAB 3: GROUNDED LEGAL Q&A ==================== -->
     <section id="tab-chat" class="tab-panel" role="tabpanel" aria-labelledby="btn-tab-chat">
       <div class="card">
-        <div class="card-title">
+        <h2 class="card-title">
           <span>💬 Grounded Document Q&amp;A (Anti-Hallucination RAG)</span>
           <span class="badge badge-safe">Verbatim Citations</span>
-        </div>
+        </h2>
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.8rem;">
           Ask any specific question about your uploaded document. Answers are strictly grounded in contract text with verbatim quotes.
         </p>
 
         <!-- Prompt Quick-Chips -->
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;" role="group" aria-label="Suggested questions">
           <span style="font-size: 0.8rem; color: var(--text-muted);">Common Inquiries:</span>
-          <button class="sample-btn" onclick="askQuestion('Can they terminate or fire me without notice?')">⚡ Termination Notice?</button>
-          <button class="sample-btn" onclick="askQuestion('Is there an unfair non-compete clause?')">⚡ Non-Compete Scope?</button>
-          <button class="sample-btn" onclick="askQuestion('What are my payment deadlines and withholding terms?')">⚡ Payment &amp; Deductions?</button>
-          <button class="sample-btn" onclick="askQuestion('Who owns the intellectual property and side projects?')">⚡ IP Ownership?</button>
+          <button class="sample-btn" onclick="askQuestion('Can they terminate or fire me without notice?')" aria-label="Ask about termination notice">⚡ Termination Notice?</button>
+          <button class="sample-btn" onclick="askQuestion('Is there an unfair non-compete clause?')" aria-label="Ask about non-compete scope">⚡ Non-Compete Scope?</button>
+          <button class="sample-btn" onclick="askQuestion('What are my payment deadlines and withholding terms?')" aria-label="Ask about payment and deductions">⚡ Payment &amp; Deductions?</button>
+          <button class="sample-btn" onclick="askQuestion('Who owns the intellectual property and side projects?')" aria-label="Ask about IP ownership">⚡ IP Ownership?</button>
         </div>
 
         <div class="chat-window">
-          <div class="chat-messages" id="chat-messages" role="log" aria-live="polite">
+          <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Chat conversation history">
             <div class="message-bubble message-bot">
               Hello! I am your LexiAid legal intelligence assistant. Ask me anything about your loaded document, such as termination rules, liability caps, or payment timelines.
             </div>
           </div>
           <div class="chat-input-bar">
-            <label for="chat-input" class="visually-hidden" style="display:none;">Ask a question</label>
-            <input type="text" id="chat-input" placeholder="Ask a question about the loaded contract..." onkeydown="if(event.key==='Enter') sendChat();">
-            <button class="btn-primary" onclick="sendChat()">Send</button>
+            <label for="chat-input" class="visually-hidden">Ask a question about the loaded contract</label>
+            <input type="text" id="chat-input" placeholder="Ask a question about the loaded contract..." aria-label="Ask a question about the loaded contract" aria-describedby="chat-input-desc" onkeydown="if(event.key==='Enter') sendChat();">
+            <p id="chat-input-desc" class="visually-hidden">Type your legal question and press Enter or click Send.</p>
+            <button class="btn-primary" onclick="sendChat()" aria-label="Send chat message">Send</button>
           </div>
         </div>
       </div>
@@ -232,14 +240,14 @@
     <!-- ==================== TAB 4: DUE DILIGENCE CHECKLIST ==================== -->
     <section id="tab-checklist" class="tab-panel" role="tabpanel" aria-labelledby="btn-tab-checklist">
       <div class="card">
-        <div class="card-title">
+        <h2 class="card-title">
           <span>✅ Actionable Due Diligence Checklist &amp; Timeline</span>
-          <button class="btn-secondary" onclick="resetChecklist()">Reset Checks</button>
-        </div>
+          <button class="btn-secondary" onclick="resetChecklist()" aria-label="Reset all checklist items">Reset Checks</button>
+        </h2>
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
           Actionable, concrete steps you must take before signing, upon signing, and during active contract performance.
         </p>
-        <div id="checklist-container">
+        <div id="checklist-container" role="group" aria-label="Due diligence action items">
           <p style="color: var(--text-muted); font-size: 0.9rem;">Analyze a document in Tab 1 first to generate your custom action checklist.</p>
         </div>
       </div>
@@ -248,18 +256,18 @@
     <!-- ==================== TAB 5: LAWYER PREP-PACK ==================== -->
     <section id="tab-prep" class="tab-panel" role="tabpanel" aria-labelledby="btn-tab-prep">
       <div class="card">
-        <div class="card-title">
+        <h2 class="card-title">
           <span>👔 Attorney Consultation Briefing Pack</span>
           <div style="display: flex; gap: 0.5rem;">
-            <button class="btn-secondary" onclick="copyLawyerPrep()">📋 Copy to Clipboard</button>
-            <button class="btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+            <button class="btn-secondary" onclick="copyLawyerPrep()" aria-label="Copy lawyer briefing to clipboard">📋 Copy to Clipboard</button>
+            <button class="btn-primary" onclick="window.print()" aria-label="Print or save briefing as PDF">🖨️ Print / Save PDF</button>
           </div>
-        </div>
+        </h2>
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
           A structured 1-page briefing memo summarizing your contract, key red flags, and targeted legal questions to make your paid consultation with a lawyer fast, focused, and cost-effective.
         </p>
 
-        <div id="lawyer-prep-content" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem;">
+        <div id="lawyer-prep-content" role="region" aria-label="Attorney briefing content" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem;">
           <p style="color: var(--text-muted); font-size: 0.9rem;">Analyze a contract in Tab 1 to populate your Attorney Briefing Pack.</p>
         </div>
       </div>

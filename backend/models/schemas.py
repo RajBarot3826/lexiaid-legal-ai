@@ -1,3 +1,9 @@
+"""Pydantic v2 request and response schemas for the LexiAid API.
+
+Defines strongly-typed data models for document analysis, contract comparison,
+grounded Q&A, and clause simplification endpoints.
+"""
+
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 

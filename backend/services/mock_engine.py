@@ -1,3 +1,10 @@
+"""Deterministic mock analysis engine for offline legal document processing.
+
+Provides high-fidelity legal analysis responses without requiring an API key,
+using keyword-based document classification and curated response templates
+for predatory freelance agreements, residential leases, and general contracts.
+"""
+
 import re
 from typing import Dict, Any, List
 from ..models.schemas import (

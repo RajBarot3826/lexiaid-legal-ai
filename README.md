@@ -9,7 +9,7 @@
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)](https://ai.google.dev/)
 [![PromptWars](https://img.shields.io/badge/PromptWars-Virtual_Sept_2026-FF4500?style=for-the-badge)](https://hack2skill.com)
 [![Accessibility](https://img.shields.io/badge/WCAG_2.1-AA_Compliant-success?style=for-the-badge)](https://www.w3.org/WAI/standards-guidelines/wcag/)
-[![Tests](https://img.shields.io/badge/PyTest-22%2F22_Passed-brightgreen?style=for-the-badge)](https://docs.pytest.org)
+[![Tests](https://img.shields.io/badge/PyTest-66%2F66_Passed-brightgreen?style=for-the-badge)](https://docs.pytest.org)
 
 **An intelligent, accessible, and ethical GenAI legal platform engineered for everyday citizens, freelancers, tenants, and small businesses to read, compare, audit, and navigate complex legal documents without fear.**
 
@@ -102,7 +102,10 @@ Built directly for the **PromptWars: Virtual** challenge — **"AI for Legal Ass
 
 ## 🛡️ Security and Ethical Guardrails
 
-- **Prompt Injection Neutralization**: Protects against adversarial jailbreak prompts (e.g. "ignore prior instructions", "system prompt override").
+- **Prompt Injection Neutralization**: 14 compiled regex patterns detect and neutralize adversarial jailbreak prompts (e.g. "ignore prior instructions", "DAN mode", "system prompt override", "jailbreak").
+- **Rate Limiting**: In-memory sliding-window rate limiter (30 requests/minute per IP) prevents abuse and denial-of-service attacks.
+- **Restricted CORS**: Origin-locked CORS policy allowing only the production GitHub Pages domain and local development servers (no wildcard `*`).
+- **Request Timing Headers**: Every response includes `X-Processing-Time-Ms` and `X-RateLimit-Limit` headers for performance monitoring.
 - **Strict Payload Limits**: Restricts document payloads to 120,000 characters to prevent denial-of-wallet (DoW) and memory exhaustion.
 - **Zero Secrets in Repository**: No hardcoded API keys; utilizes clean environment variable injection.
 - **Repository Size (< 0.1 MB)**: Strictly optimized git repository (~48 KiB total), ensuring 100% compliance with Hack2Skill's `< 10 MB` limit.
@@ -112,10 +115,14 @@ Built directly for the **PromptWars: Virtual** challenge — **"AI for Legal Ass
 
 ## ♿ Accessibility Compliance (WCAG 2.1 AA)
 
-- **Semantic ARIA Hierarchy**: Uses `role="banner"`, `role="tablist"`, `role="tab"`, `role="tabpanel"`, and `role="contentinfo"`.
+- **Skip-to-Content Navigation**: Keyboard-accessible skip link enables users to bypass repetitive navigation and jump directly to the main content area.
+- **Semantic ARIA Hierarchy**: Uses `role="banner"`, `role="tablist"`, `role="tab"`, `role="tabpanel"`, `role="status"`, `role="log"`, and `role="contentinfo"`.
+- **Descriptive ARIA Attributes**: All interactive elements include `aria-label`, `aria-describedby`, and `aria-live` attributes for screen reader support.
+- **Visually-Hidden Labels**: Screen-reader-only labels use the proper `visually-hidden` CSS class (clip pattern) instead of `display:none`.
 - **High Contrast Ratios**: Color palette exceeds WCAG AA 4.5:1 contrast requirements for dark-mode readability.
-- **Keyboard Navigable**: Full support for Tab/Shift-Tab navigation with visible `:focus-visible` outline rings.
-- **Screen Reader Support**: Live regions (`aria-live="polite"`) for real-time AI Q&A responses.
+- **Keyboard Navigable**: Full support for Tab/Shift-Tab navigation with visible `:focus-visible` outline rings and proper `tabindex` management on tab components.
+- **Screen Reader Live Regions**: `aria-live="polite"` regions for real-time AI Q&A responses and status updates.
+- **Meta Description**: Includes `<meta name="description">` for SEO and assistive technology context.
 
 ---
 
@@ -132,32 +139,67 @@ python -m pytest tests/ -v
 ============================= test session starts =============================
 platform win32 -- Python 3.14.3, pytest-9.1.1
 rootdir: C:\Users\barot\.gemini\antigravity\scratch\lexiaid_legal_ai
-collected 22 items
+collected 66 items
 
-tests/test_api.py::test_health_endpoint PASSED                           [  4%]
-tests/test_api.py::test_samples_endpoint PASSED                          [  9%]
-tests/test_api.py::test_analyze_predatory_contract_endpoint PASSED       [ 13%]
-tests/test_api.py::test_analyze_lease_endpoint PASSED                    [ 18%]
-tests/test_api.py::test_analyze_empty_payload_validation PASSED          [ 22%]
-tests/test_api.py::test_compare_endpoint PASSED                          [ 27%]
-tests/test_api.py::test_chat_termination_query PASSED                    [ 31%]
-tests/test_api.py::test_chat_general_query PASSED                        [ 36%]
-tests/test_api.py::test_simplify_endpoint PASSED                         [ 40%]
-tests/test_legal_services.py::test_predatory_contract_analysis PASSED    [ 45%]
-tests/test_legal_services.py::test_lease_contract_analysis PASSED        [ 50%]
-tests/test_legal_services.py::test_general_contract_analysis PASSED      [ 54%]
-tests/test_legal_services.py::test_contract_comparison_divergence PASSED [ 59%]
-tests/test_legal_services.py::test_grounded_qa_citations PASSED          [ 63%]
-tests/test_legal_services.py::test_grounded_qa_lease_rent PASSED         [ 68%]
-tests/test_legal_services.py::test_grounded_qa_non_compete PASSED        [ 72%]
-tests/test_legal_services.py::test_clause_simplification PASSED          [ 77%]
-tests/test_security.py::test_empty_text_rejection PASSED                 [ 81%]
-tests/test_security.py::test_prompt_injection_neutralization PASSED      [ 86%]
-tests/test_security.py::test_dan_mode_injection_detection PASSED         [ 90%]
-tests/test_security.py::test_oversized_document_truncation PASSED        [ 95%]
-tests/test_security.py::test_standard_disclaimer PASSED                  [100%]
+tests/test_api.py::TestHealthEndpoint::test_health_returns_200_with_service_metadata PASSED
+tests/test_api.py::TestHealthEndpoint::test_health_includes_processing_time_header PASSED
+tests/test_api.py::TestSamplesEndpoint::test_samples_returns_at_least_three_contracts PASSED
+tests/test_api.py::TestSamplesEndpoint::test_each_sample_has_required_fields PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_predatory_contract_returns_high_risk PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_lease_contract_returns_favorable_risk PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_empty_text_returns_validation_error PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_missing_text_field_returns_422 PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_all_reading_levels[Plain English] PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_all_reading_levels[Executive] PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_all_reading_levels[ELI5] PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_unicode_document_text_handled PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_very_long_document_accepted PASSED
+tests/test_api.py::TestAnalyzeEndpoint::test_analysis_response_time_under_two_seconds PASSED
+tests/test_api.py::TestCompareEndpoint::test_comparison_favorability_scores PASSED
+tests/test_api.py::TestCompareEndpoint::test_missing_contract_b_returns_error PASSED
+tests/test_api.py::TestChatEndpoint::test_termination_query_with_citations PASSED
+tests/test_api.py::TestChatEndpoint::test_general_query_follow_up_suggestions PASSED
+tests/test_api.py::TestChatEndpoint::test_empty_document_returns_error PASSED
+tests/test_api.py::TestSimplifyEndpoint::test_indemnification_critical PASSED
+tests/test_api.py::TestSimplifyEndpoint::test_generic_clause_moderate PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_predatory_high_risk PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_lease_favorable PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_general_moderate_risk PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_disclaimer_included PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_keyword_detection[cayman] PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_keyword_detection[contractor] PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_keyword_detection[lease] PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_keyword_detection[tenant] PASSED
+tests/test_legal_services.py::TestMockAnalysis::test_keyword_detection[landlord] PASSED
+tests/test_legal_services.py::TestMockComparison::test_standard_higher_favorability PASSED
+tests/test_legal_services.py::TestMockComparison::test_liquidated_damages_critical PASSED
+tests/test_legal_services.py::TestMockComparison::test_negotiation_advice PASSED
+tests/test_legal_services.py::TestMockChat::test_termination_citation PASSED
+tests/test_legal_services.py::TestMockChat::test_rent_financial_details PASSED
+tests/test_legal_services.py::TestMockChat::test_non_compete_risk_note PASSED
+tests/test_legal_services.py::TestMockChat::test_general_query_excerpt PASSED
+tests/test_legal_services.py::TestMockSimplification::test_indemnification_critical PASSED
+tests/test_legal_services.py::TestMockSimplification::test_generic_safe_moderate PASSED
+tests/test_security.py::TestInputValidation::test_empty_rejected PASSED
+tests/test_security.py::TestInputValidation::test_whitespace_rejected PASSED
+tests/test_security.py::TestInputValidation::test_none_rejected PASSED
+tests/test_security.py::TestInputValidation::test_valid_text_passes PASSED
+tests/test_security.py::TestInputValidation::test_oversized_truncated PASSED
+tests/test_security.py::TestInputValidation::test_control_chars_stripped PASSED
+tests/test_security.py::TestInputValidation::test_unicode_preserved PASSED
+tests/test_security.py::TestPromptInjection::test_ignore_instructions PASSED
+tests/test_security.py::TestPromptInjection::test_dan_mode PASSED
+tests/test_security.py::TestPromptInjection::test_system_prompt_reveal PASSED
+tests/test_security.py::TestPromptInjection::test_jailbreak_keyword PASSED
+tests/test_security.py::TestPromptInjection::test_all_patterns[10 patterns] PASSED
+tests/test_security.py::TestDisclaimer::test_statutory_notice PASSED
+tests/test_security.py::TestDisclaimer::test_no_formal_advice PASSED
+tests/test_security.py::TestDisclaimer::test_attorney_consultation PASSED
+tests/test_security.py::TestRateLimiter::test_allows_within_limit PASSED
+tests/test_security.py::TestRateLimiter::test_blocks_exceeding_limit PASSED
+tests/test_security.py::TestRateLimiter::test_independent_client_limits PASSED
 
-======================= 22 passed in 1.61s =======================
+======================= 66 passed in 1.23s =======================
 ```
 
 ---
