@@ -1,0 +1,24 @@
+INDEPENDENT CONTRACTOR & INTELLECTUAL PROPERTY ASSIGNMENT AGREEMENT
+
+This Agreement is entered into on January 15, 2026, by and between Apex Global Solutions Inc. ("Company") and Jane Doe ("Contractor").
+
+1. SCOPE OF SERVICES
+Contractor agrees to perform software development, architectural design, and related consulting services as detailed in Statement of Work #101. Contractor shall dedicate a minimum of 45 hours per week exclusively to Company projects.
+
+2. COMPENSATION & PAYMENT TERMS
+Company agrees to pay Contractor a fixed sum of $4,500 monthly. Payment shall be disbursed on Net 90 terms following receipt and unconditional approval of monthly invoices. Company reserves the unilateral right to withhold up to 40% of fees for any perceived deficiencies or subjective dissatisfaction with deliverables.
+
+3. UNILATERAL TERMINATION
+Company may terminate this Agreement at any time, with or without cause, upon 24 hours written electronic notice. Contractor may terminate this Agreement only upon providing 60 days advance written notice, during which Contractor must complete all assigned milestones without additional compensation.
+
+4. COMPREHENSIVE INTELLECTUAL PROPERTY ASSIGNMENT
+Contractor irrevocably assigns and transfers to Company all worldwide right, title, and interest in and to any and all inventions, code, designs, algorithms, workflows, and ideas conceived, developed, or reduced to practice by Contractor during the term of this Agreement, whether created during working hours or personal time, and whether utilizing Company equipment or personal resources, including any pre-existing open-source or proprietary tools incorporated into deliverables.
+
+5. NON-COMPETE & RESTRICTIVE COVENANTS
+For a duration of thirty-six (36) months following the termination of this Agreement for any reason, Contractor shall not directly or indirectly engage in, consult for, advise, invest in, or be employed by any enterprise operating in the enterprise software, technology, or consulting domains worldwide.
+
+6. UNLIMITED INDEMNIFICATION & LIABILITY
+Contractor shall defend, indemnify, and hold harmless Company, its affiliates, directors, officers, and agents from and against any and all claims, liabilities, losses, damages, legal costs, and expenses (including attorneys' fees) arising out of or resulting from Contractor's performance, alleged breach of warranty, or any third-party intellectual property claim, without monetary limitation or liability cap.
+
+7. GOVERNING LAW & MANDATORY ARBITRATION
+This Agreement shall be governed by and construed in accordance with the laws of the Cayman Islands. Any dispute arising out of or related to this Agreement shall be resolved through binding arbitration in George Town, Cayman Islands. Contractor waives all rights to a jury trial or class action proceedings and agrees to bear all preliminary arbitration filing fees.

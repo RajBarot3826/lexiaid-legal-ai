@@ -1,0 +1,24 @@
+MUTUAL NON-DISCLOSURE & PROPRIETARY RIGHTS AGREEMENT (REVISED DRAFT)
+
+This Mutual Non-Disclosure Agreement ("Agreement") is entered into on February 15, 2026, by and between Horizon Labs Inc. ("Party A") and Nexus Technologies Corp. ("Party B").
+
+1. PURPOSE & EXCLUSIVITY
+The parties wish to explore a potential strategic business collaboration regarding AI software integration. Party A agrees not to engage with any competing AI vendors during the evaluation period of six (6) months.
+
+2. CONFIDENTIAL INFORMATION DEFINITION
+"Confidential Information" means all technical, business, financial, operational, and customer data disclosed by Party B, including all derivative works and concepts developed jointly during discussions.
+
+3. EXCLUSIONS FROM CONFIDENTIALITY
+Information is excluded only if established by clear and convincing documentary proof that it was publicly known or previously possessed by Party A prior to disclosure.
+
+4. OBLIGATIONS & RESIDUALS RESTRICTION
+Party A agrees to hold Confidential Information in strictest confidence and shall not reverse engineer, decompile, or incorporate ideas into internal product lines. Party A waives any "residuals clause" protection for ideas retained in unaided human memory.
+
+5. DURATION & SURVIVAL
+The confidentiality obligations shall remain in effect for a period of five (5) years from disclosure, except trade secrets which shall remain protected in perpetuity.
+
+6. LIQUIDATED DAMAGES & INJUNCTIVE RELIEF
+In the event of an alleged breach of confidentiality by Party A, Party B shall be entitled to liquidated damages of $100,000 per violation without the requirement of proving actual damages, plus reimbursement of all legal counsel fees.
+
+7. GOVERNING LAW & JURISDICTION
+This Agreement shall be governed by the laws of New York State. Any dispute shall be adjudicated in the Commercial Division of the Supreme Court of New York.

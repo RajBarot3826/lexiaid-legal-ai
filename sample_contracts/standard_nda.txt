@@ -1,0 +1,24 @@
+MUTUAL NON-DISCLOSURE AGREEMENT
+
+This Mutual Non-Disclosure Agreement ("Agreement") is entered into on February 10, 2026, by and between Horizon Labs Inc. ("Party A") and Nexus Technologies Corp. ("Party B").
+
+1. PURPOSE
+The parties wish to explore a potential strategic business collaboration regarding artificial intelligence software integration ("Purpose"). In connection with this Purpose, each party may disclose proprietary and confidential information to the other.
+
+2. CONFIDENTIAL INFORMATION DEFINITION
+"Confidential Information" means all technical, business, financial, operational, and software data disclosed by one party ("Discloser") to the other ("Recipient"), whether orally or in writing, marked as confidential or that reasonably should be understood to be confidential given the nature of the information.
+
+3. EXCLUSIONS FROM CONFIDENTIALITY
+Confidential Information does not include information that: (a) is or becomes publicly known through no breach of Recipient; (b) was already known to Recipient prior to disclosure; (c) is independently developed without reference to Discloser's information; or (d) is rightfully obtained from a third party without restriction.
+
+4. OBLIGATIONS OF RECIPIENT
+Recipient agrees to: (a) hold Confidential Information in strict confidence; (b) protect it using at least reasonable care; (c) disclose it only to employees, advisors, or contractors who have a legitimate need to know and are bound by confidentiality obligations at least as restrictive as this Agreement; and (d) not use it for any purpose other than the authorized Purpose.
+
+5. DURATION & RETURN OF MATERIALS
+The confidentiality obligations shall remain in effect for a period of two (2) years from the date of disclosure. Upon written request of Discloser, Recipient shall promptly return or certify the secure destruction of all confidential materials and copies thereof.
+
+6. NO LICENSE OR OBLIGATION
+Nothing herein obligates either party to proceed with any business transaction or grants any license under any intellectual property rights of either party.
+
+7. GOVERNING LAW
+This Agreement shall be governed by the laws of the State of Delaware, without regard to conflicts of law principles.
