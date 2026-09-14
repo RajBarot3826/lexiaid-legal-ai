@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexiAid — AI for Legal Assistance & Access</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Statutory Legal Disclaimer Banner -->
+  <aside class="disclaimer-banner" role="complementary" aria-label="Legal Disclaimer">
+    <span>⚖️ <strong>Informational Assistance Only:</strong> LexiAid uses artificial intelligence to explain and organize legal documents. It is not formal legal advice and does not substitute for a qualified attorney.</span>
+  </aside>
+
+  <!-- Top Application Header -->
+  <header role="banner">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">⚖️</div>
+      <div>
+        <h1 class="brand-name">LexiAid</h1>
+        <p class="brand-tagline">AI for Legal Assistance &amp; Document Intelligence • PromptWars Edition</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="status-badge" id="ai-status">
+        <span class="pulse-dot"></span>
+        <span id="ai-status-text">Gemini Intelligence Active</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- Tab Navigation (Accessible ARIA TabList) -->
+  <nav class="tab-nav" role="tablist" aria-label="Legal Tools">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-analyze" id="btn-tab-analyze" onclick="switchTab('analyze')">
+      <span>📄</span> Analyze &amp; Simplify
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-compare" id="btn-tab-compare" onclick="switchTab('compare')">
+      <span>⚖️</span> Compare Contracts
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-chat" id="btn-tab-chat" onclick="switchTab('chat')">
+      <span>💬</span> Grounded Q&amp;A Chat
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-checklist" id="btn-tab-checklist" onclick="switchTab('checklist')">
+      <span>✅</span> Due Diligence Checklist
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-prep" id="btn-tab-prep" onclick="switchTab('prep')">
+      <span>👔</span> Lawyer Prep-Pack
+    </button>
+  </nav>
+
+  <!-- Main Container -->
+  <main role="main">
+
+    <!-- ==================== TAB 1: ANALYZE & SIMPLIFY ==================== -->
+    <section id="tab-analyze" class="tab-panel active" role="tabpanel" aria-labelledby="btn-tab-analyze">
+      <div class="card">
+        <div class="card-title">
+          <span>Upload or Paste Legal Document</span>
+          <div class="sample-bar">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Quick 1-Click Samples:</span>
+            <button class="sample-btn" onclick="loadSample('predatory_freelance')">⚠️ Predatory Freelance</button>
+            <button class="sample-btn" onclick="loadSample('residential_lease')">🏠 Residential Lease</button>
+            <button class="sample-btn" onclick="loadSample('standard_nda')">🔒 Mutual NDA</button>
+          </div>
+        </div>
+
+        <label for="contract-input" class="visually-hidden" style="display:none;">Legal Document Text</label>
+        <textarea id="contract-input" placeholder="Paste your legal contract, rental lease, terms of service, or employment agreement here (or click one of the quick samples above)..." aria-label="Legal Document Text"></textarea>
+
+        <div class="action-row">
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <label for="reading-level" style="font-size: 0.88rem; color: var(--text-secondary);">Reading Level:</label>
+            <select id="reading-level" style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.4rem 0.8rem; border-radius: 6px;">
+              <option value="Plain English" selected>Plain English (8th Grade)</option>
+              <option value="Executive">Executive Summary (Business)</option>
+              <option value="ELI5">ELI5 (Super Simple)</option>
+            </select>
+          </div>
+          <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()">
+            <span id="btn-analyze-text">🔍 Analyze Contract &amp; Audit Risks</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Analysis Results (Hidden Initially) -->
+      <div id="analysis-results" style="display: none;">
+        
+        <!-- Risk & Score Banner -->
+        <div class="score-banner">
+          <div class="gauge-box">
+            <div class="gauge-circle" id="risk-circle">88</div>
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Legal Risk Index</div>
+              <h2 id="risk-verdict-title" style="font-size: 1.4rem; margin: 0.2rem 0;">High Risk / Predatory</h2>
+              <p id="doc-type-badge" style="font-size: 0.85rem; color: var(--accent-cyan);">Independent Contractor Agreement</p>
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 280px;">
+            <h3 style="font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Executive Summary:</h3>
+            <p id="executive-summary" style="font-size: 0.92rem; line-height: 1.5;"></p>
+          </div>
+        </div>
+
+        <!-- 2-Column Grid: Risks on Left, Clause Explanations on Right -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem;">
+          
+          <!-- Red Flag Risk Sentinel -->
+          <div class="card">
+            <div class="card-title">
+              <span>🚨 Critical Red Flags &amp; Trap Scanner</span>
+              <span class="badge badge-critical" id="risk-count-badge">4 Traps Found</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Identified contractual clauses that impose extreme liability, financial traps, or restrict your statutory rights.
+            </p>
+            <div id="risk-cards-container"></div>
+          </div>
+
+          <!-- Clause-by-Clause Simplification -->
+          <div class="card">
+            <div class="card-title">
+              <span>📖 Plain-English Clause Breakdown</span>
+              <span class="badge badge-safe">Legalese Decomposed</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Clause-by-clause translation into everyday conversational language with practical implications.
+            </p>
+            <div id="clauses-container"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: COMPARE CONTRACTS ==================== -->
+    <section id="tab-compare" class="tab-panel" role="tabpanel" aria-labelledby="btn-tab-compare">
+      <div class="card">
+        <div class="card-title">
+          <span>Dual-Contract Divergence &amp; Favorability Engine</span>
+          <button class="sample-btn" onclick="loadComparisonSample()">⚡ Load Sample: Standard NDA vs. Revised Draft</button>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Compare two versions of an agreement, a vendor contract vs. counter-proposal, or lease revision to detect unilateral changes and traps.
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label for="compare-text-a" style="font-size: 0.88rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">
+              Contract Version A (e.g. Original / Standard NDA)
+            </label>
+            <textarea id="compare-text-a" style="min-height: 200px;" placeholder="Paste Version A..."></textarea>
+          </div>
+          <div>
+            <label for="compare-text-b" style="font-size: 0.88rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">
+              Contract Version B (e.g. Revised Vendor Draft)
+            </label>
+            <textarea id="compare-text-b" style="min-height: 200px;" placeholder="Paste Version B..."></textarea>
+          </div>
+        </div>
+        <div style="text-align: right; margin-top: 1rem;">
+          <button class="btn-primary" onclick="runComparison()">
+            <span>⚖️ Compare Contracts &amp; Analyze Favorability</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Comparison Results -->
+      <div id="compare-results" style="display: none;">
+        <div class="score-banner">
+          <div style="display: flex; gap: 2rem; align-items: center;">
+            <div style="text-align: center;">
+              <div style="font-size: 0.8rem; color: var(--text-secondary);">VERSION A FAVORABILITY</div>
+              <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-emerald);" id="score-a">78%</div>
+            </div>
+            <div style="font-size: 1.5rem; color: var(--text-muted);">vs.</div>
+            <div style="text-align: center;">
+              <div style="font-size: 0.8rem; color: var(--text-secondary);">VERSION B FAVORABILITY</div>
+              <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-rose);" id="score-b">32%</div>
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <h3 style="font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Strategic Recommendation:</h3>
+            <p id="compare-advice" style="font-size: 0.92rem;"></p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Key Clause Divergences &amp; Shift in Rights</h3>
+          <div id="comparison-table-container"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: GROUNDED LEGAL Q&A ==================== -->
+    <section id="tab-chat" class="tab-panel" role="tabpanel" aria-labelledby="btn-tab-chat">
+      <div class="card">
+        <div class="card-title">
+          <span>💬 Grounded Document Q&amp;A (Anti-Hallucination RAG)</span>
+          <span class="badge badge-safe">Verbatim Citations</span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.8rem;">
+          Ask any specific question about your uploaded document. Answers are strictly grounded in contract text with verbatim quotes.
+        </p>
+
+        <!-- Prompt Quick-Chips -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Common Inquiries:</span>
+          <button class="sample-btn" onclick="askQuestion('Can they terminate or fire me without notice?')">⚡ Termination Notice?</button>
+          <button class="sample-btn" onclick="askQuestion('Is there an unfair non-compete clause?')">⚡ Non-Compete Scope?</button>
+          <button class="sample-btn" onclick="askQuestion('What are my payment deadlines and withholding terms?')">⚡ Payment &amp; Deductions?</button>
+          <button class="sample-btn" onclick="askQuestion('Who owns the intellectual property and side projects?')">⚡ IP Ownership?</button>
+        </div>
+
+        <div class="chat-window">
+          <div class="chat-messages" id="chat-messages" role="log" aria-live="polite">
+            <div class="message-bubble message-bot">
+              Hello! I am your LexiAid legal intelligence assistant. Ask me anything about your loaded document, such as termination rules, liability caps, or payment timelines.
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <label for="chat-input" class="visually-hidden" style="display:none;">Ask a question</label>
+            <input type="text" id="chat-input" placeholder="Ask a question about the loaded contract..." onkeydown="if(event.key==='Enter') sendChat();">
+            <button class="btn-primary" onclick="sendChat()">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: DUE DILIGENCE CHECKLIST ==================== -->
+    <section id="tab-checklist" class="tab-panel" role="tabpanel" aria-labelledby="btn-tab-checklist">
+      <div class="card">
+        <div class="card-title">
+          <span>✅ Actionable Due Diligence Checklist &amp; Timeline</span>
+          <button class="btn-secondary" onclick="resetChecklist()">Reset Checks</button>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Actionable, concrete steps you must take before signing, upon signing, and during active contract performance.
+        </p>
+        <div id="checklist-container">
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Analyze a document in Tab 1 first to generate your custom action checklist.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: LAWYER PREP-PACK ==================== -->
+    <section id="tab-prep" class="tab-panel" role="tabpanel" aria-labelledby="btn-tab-prep">
+      <div class="card">
+        <div class="card-title">
+          <span>👔 Attorney Consultation Briefing Pack</span>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn-secondary" onclick="copyLawyerPrep()">📋 Copy to Clipboard</button>
+            <button class="btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+          </div>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          A structured 1-page briefing memo summarizing your contract, key red flags, and targeted legal questions to make your paid consultation with a lawyer fast, focused, and cost-effective.
+        </p>
+
+        <div id="lawyer-prep-content" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem;">
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Analyze a contract in Tab 1 to populate your Attorney Briefing Pack.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Persistent Ethical Footer -->
+  <footer role="contentinfo">
+    <p>LexiAid • Engineered with Google Cloud &amp; Gemini AI for PromptWars: Virtual • Strictly for Informational Assistance</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
